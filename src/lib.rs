@@ -75,14 +75,14 @@ pub fn aead_encrypt(key: &[u8], iv: &[u8], message: &[u8], aad: &[u8]) -> (Vec<u
     finalization(&mut ss, key);
 
     // tag
-    tag.clone_from_slice(&ss[S_SIZE - KEY_LEN ..]);
+    tag.clone_from_slice(&ss[S_SIZE - KEY_LEN..]);
 
     (output, tag)
 }
 
 
 pub fn aead_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8], aad: &[u8], tag: &[u8]) -> Result<Vec<u8>, DecryptFail> {
-    if tag.len() < KEY_LEN { Err(DecryptFail::TagLengthError)? };
+    if tag.len() != KEY_LEN { Err(DecryptFail::TagLengthError)? };
 
     let s = aad.len() / RATE + 1;
     let t = ciphertext.len() / RATE + 1;

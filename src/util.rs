@@ -17,7 +17,6 @@ pub fn u64_to_u8(input: &[u64], output: &mut [u8]) {
     }
 }
 
-#[inline]
 pub fn eq(a: &[u8], b: &[u8]) -> bool {
     if a.len() != b.len() { return false };
 
