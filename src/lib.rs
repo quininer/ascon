@@ -1,4 +1,3 @@
-#![feature(question_mark)]
 #![feature(collections)]
 #![no_std]
 
@@ -126,7 +125,7 @@ pub fn aead_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8], aad: &[u8], tag: &
     // finalization
     finalization(&mut ss, key);
 
-    if util::eq(&ss[S_SIZE - KEY_LEN..], &tag) {
+    if util::eq(&ss[S_SIZE - KEY_LEN..], tag) {
         Ok(mm[..ciphertext.len()].into())
     } else {
         Err(DecryptFail::AuthenticationFail)
