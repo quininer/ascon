@@ -61,7 +61,7 @@ pub fn aead_encrypt(key: &[u8], iv: &[u8], message: &[u8], aad: &[u8]) -> (Vec<u
             ss[j] ^= mm[i * RATE + j];
             output[i * RATE + j] = ss[j];
         }
-        permutation(&mut ss, B);
+        permutation(&mut ss, 12 - B, B);
     }
     for j in 0..RATE {
         ss[j] ^= mm[(t - 1) * RATE + j];
@@ -112,7 +112,7 @@ pub fn aead_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8], aad: &[u8], tag: &
             mm[i * RATE + j] = ss[j] ^ ciphertext[i * RATE + j];
             ss[j] = ciphertext[i * RATE + j];
         }
-        permutation(&mut ss, B);
+        permutation(&mut ss, 12 - B, B);
     }
     for j in 0..l {
         mm[(t - 1) * RATE + j] = ss[j] ^ ciphertext[(t - 1) * RATE + j];
@@ -154,8 +154,8 @@ fn ascon_tv_test() {
     let message = b"ascon";
 
     let (ciphertext, tag) = aead_encrypt(&key, &iv, message, aad);
-    assert_eq!(ciphertext, [0xc3, 0x49, 0x0c, 0x94, 0xf5]);
-    assert_eq!(tag, [0x56, 0x19, 0x4f, 0x08, 0x41, 0xef, 0x95, 0xb5, 0x6f, 0x3c, 0x84, 0x9b, 0x4e, 0x71, 0xee, 0x23]);
+    assert_eq!(ciphertext, [0x4c, 0x8c, 0x42, 0x89, 0x49]);
+    assert_eq!(tag, [0x65, 0xfd, 0x17, 0xb6, 0xd3, 0x0c, 0xd8, 0x76, 0xa0, 0x5a, 0x8e, 0xfc, 0xec, 0xad, 0x99, 0x3a]);
 
     let plaintext = aead_decrypt(&key, &iv, &ciphertext, aad, &tag).unwrap();
     assert_eq!(plaintext, message);

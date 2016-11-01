@@ -1,12 +1,12 @@
 use ::util::{ u8_to_u64, u64_to_u8 };
 
 
-pub fn permutation(s: &mut [u8], rounds: usize) {
+pub fn permutation(s: &mut [u8], start: usize, rounds: usize) {
     let mut x = [0; 5];
     let mut t = [0; 5];
     u8_to_u64(s, &mut x);
 
-    for i in 0..rounds as u64 {
+    for i in start as u64..(start + rounds) as u64 {
         x[2] ^= ((0xfu64 - i) << 4) | i;
 
         x[0] ^= x[4]; x[4] ^= x[3]; x[2] ^= x[1];
@@ -39,7 +39,7 @@ pub fn initialization(s: &mut [u8], key: &[u8], nonce: &[u8]) {
         s[::S_SIZE - ::KEY_LEN + i] = b;
     }
 
-    permutation(s, ::A);
+    permutation(s, 12 - ::A, ::A);
 
     for (i, &b) in key.iter().enumerate() {
         s[::S_SIZE - key.len() + i] ^= b;
@@ -50,7 +50,7 @@ pub fn finalization(s: &mut [u8], key: &[u8]) {
     for (i, &b) in key.iter().enumerate() {
         s[::RATE + i] ^= b;
     }
-    permutation(s, ::A);
+    permutation(s, 12 - ::A, ::A);
     for (i, &b) in key.iter().enumerate() {
         s[::S_SIZE - key.len() + i] ^= b;
     }
@@ -61,6 +61,6 @@ pub fn process_aad(ss: &mut [u8], aa: &[u8], s: usize) {
         for j in 0..::RATE {
             ss[j] ^= aa[i * ::RATE + j];
         }
-        permutation(ss, ::B);
+        permutation(ss, 12 - ::B, ::B);
     }
 }
