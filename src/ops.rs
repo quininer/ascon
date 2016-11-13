@@ -32,17 +32,15 @@ pub fn initialization(s: &mut [u8], key: &[u8], nonce: &[u8]) {
     s[2] = ::A as u8;
     s[3] = ::B as u8;
 
-    for (i, &b) in key.iter().enumerate() {
-        s[::S_SIZE - 2 * ::KEY_LEN + i] = b;
-    }
-    for (i, &b) in nonce.iter().enumerate() {
-        s[::S_SIZE - ::KEY_LEN + i] = b;
-    }
+    let mut pos = ::S_SIZE - 2 * ::KEY_LEN;
+    s[pos..pos + key.len()].clone_from_slice(&key);
+    pos += ::KEY_LEN;
+    s[pos..pos + nonce.len()].clone_from_slice(&nonce);
 
     permutation(s, 12 - ::A, ::A);
 
     for (i, &b) in key.iter().enumerate() {
-        s[::S_SIZE - key.len() + i] ^= b;
+        s[pos + i] ^= b;
     }
 }
 
@@ -52,7 +50,7 @@ pub fn finalization(s: &mut [u8], key: &[u8]) {
     }
     permutation(s, 12 - ::A, ::A);
     for (i, &b) in key.iter().enumerate() {
-        s[::S_SIZE - key.len() + i] ^= b;
+        s[::S_SIZE - ::KEY_LEN + i] ^= b;
     }
 }
 
