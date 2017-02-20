@@ -33,9 +33,9 @@ pub fn initialization(s: &mut [u8], key: &[u8], nonce: &[u8]) {
     s[3] = ::B as u8;
 
     let mut pos = ::S_SIZE - 2 * ::KEY_LEN;
-    s[pos..pos + key.len()].clone_from_slice(&key);
+    s[pos..pos + key.len()].copy_from_slice(&key);
     pos += ::KEY_LEN;
-    s[pos..pos + nonce.len()].clone_from_slice(&nonce);
+    s[pos..pos + nonce.len()].copy_from_slice(&nonce);
 
     permutation(s, 12 - ::A, ::A);
 

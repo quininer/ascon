@@ -18,13 +18,12 @@ pub fn u64_to_u8(input: &[u64], output: &mut [u8]) {
 }
 
 pub fn eq(a: &[u8], b: &[u8]) -> bool {
-    if a.len() != b.len() { return false };
-
-    let mut d = 0;
-    for (x, y) in a.iter().zip(b.iter()) {
-        d |= x ^ y;
+    if a.len() != b.len() {
+        false
+    } else {
+        a.iter().zip(b)
+            .map(|(x, y)| x ^ y)
+            .fold(0, |sum, next| sum | next)
+            .eq(&0)
     }
-
-    // NOTE ((1 & ((d - 1) >> 8)) - 1) != 0
-    d == 0
 }

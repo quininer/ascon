@@ -1,13 +1,8 @@
-#![feature(collections)]
-#![no_std]
-
-#[macro_use] extern crate collections;
 extern crate byteorder;
 
 mod util;
 mod ops;
 
-use collections::Vec;
 use ops::{ initialization, permutation, process_aad, finalization };
 
 
@@ -36,10 +31,10 @@ pub fn aead_encrypt(key: &[u8], iv: &[u8], message: &[u8], aad: &[u8]) -> (Vec<u
     let mut tag = [0; KEY_LEN];
 
     // pad aad
-    aa[..aad.len()].clone_from_slice(&aad);
+    aa[..aad.len()].copy_from_slice(&aad);
     aa[aad.len()] = 0x80;
     // pad message
-    mm[..message.len()].clone_from_slice(&message);
+    mm[..message.len()].copy_from_slice(&message);
     mm[message.len()] = 0x80;
 
     // init
@@ -56,7 +51,7 @@ pub fn aead_encrypt(key: &[u8], iv: &[u8], message: &[u8], aad: &[u8]) -> (Vec<u
         for j in 0..RATE {
             ss[j] ^= mm[i * RATE + j];
         }
-        output[(i * RATE)..(i * RATE + RATE)].clone_from_slice(&ss[..RATE]);
+        output[(i * RATE)..(i * RATE + RATE)].copy_from_slice(&ss[..RATE]);
         permutation(&mut ss, 12 - B, B);
     }
     for j in 0..RATE {
@@ -70,7 +65,7 @@ pub fn aead_encrypt(key: &[u8], iv: &[u8], message: &[u8], aad: &[u8]) -> (Vec<u
     finalization(&mut ss, key);
 
     // tag
-    tag.clone_from_slice(&ss[S_SIZE - KEY_LEN..]);
+    tag.copy_from_slice(&ss[S_SIZE - KEY_LEN..]);
 
     (output, tag)
 }
@@ -88,7 +83,7 @@ pub fn aead_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8], aad: &[u8], tag: &
     let mut mm = vec![0; t * RATE];
 
     // pad aad
-    aa[..aad.len()].clone_from_slice(&aad);
+    aa[..aad.len()].copy_from_slice(&aad);
     aa[aad.len()] = 0x80;
 
     // init
@@ -105,7 +100,7 @@ pub fn aead_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8], aad: &[u8], tag: &
         for j in 0..RATE {
             mm[i * RATE + j] = ss[j] ^ ciphertext[i * RATE + j];
         }
-        ss[..RATE].clone_from_slice(&ciphertext[(i * RATE)..(i * RATE + RATE)]);
+        ss[..RATE].copy_from_slice(&ciphertext[(i * RATE)..(i * RATE + RATE)]);
         permutation(&mut ss, 12 - B, B);
     }
     for j in 0..l {
